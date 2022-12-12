@@ -17,8 +17,10 @@ class GameUI:
         self.correct_sound = pygame.mixer.Sound('res/sound/correct_sound.mp3')
         self.wrong_sound = pygame.mixer.Sound('res/sound/wrong_sound.mp3')
         self.gold = '#FFBF00'
+        self.question_map = [True, True, True, True]
         self.questions = generate_questions()
         self.question_nr = 0
+        self.click = True
         self.answer_bg_xcoord = 360
         self.answer_bg_ycoord = 740
         self.question = self.questions[self.question_nr]['question']
@@ -34,6 +36,7 @@ class GameUI:
         self.font = pygame.font.Font('freesansbold.ttf', 28)
         self.font_2 = pygame.font.Font('freesansbold.ttf', 24)
         self.font_3 = pygame.font.Font('freesansbold.ttf', 20)
+        self.font_4 = pygame.font.Font('freesansbold.ttf', 16)
         self.help_tools = pygame.image.load('res/img/help_tools.png')
         self.remove_help = pygame.image.load('res/img/remove_help.png')
         self.answers_bg_1 = self.answers_bg_2 = self.answers_bg_3 = self.answers_bg_4 = pygame.image.load('res/img'
@@ -43,10 +46,18 @@ class GameUI:
         if click:
             if 361 > mx > 212 and 143 < my < 237 and not self.half_cut:
                 self.half_cut = True
+                self.half_cut_function()
             if 524 > mx > 375 and 143 < my < 237 and not self.phone:
                 self.phone = True
             if 686 > mx > 536 and 143 < my < 237 and not self.audience:
                 self.audience = True
+
+    def half_cut_function(self):
+        two_bad = self.questions[self.question_nr]['two_bad']
+        for i in range(len(self.answers)):
+            if self.answers[i] in two_bad:
+                self.answers[i] = ""
+                self.question_map[i] = False
 
     def show_correct_or_false(self, res):
         self.render_answers_background()
@@ -108,6 +119,7 @@ class GameUI:
         self.question = self.questions[self.question_nr]['question']
         self.answers = self.questions[self.question_nr]['answers']
         self.correct = self.questions[self.question_nr]['correct']
+        self.question_map = [True, True, True, True]
 
     def render_answers_background(self):
         answers_bg_rect = self.answers_bg_1.get_rect()
@@ -130,7 +142,9 @@ class GameUI:
         self.screen.blit(ans_d, (988, 852))
 
     def check_answers_length(self, ans):
-        if len(ans) > 40:
+        if len(ans) > 60:
+            return self.font_4.render(ans, True, self.white)
+        elif len(ans) > 40:
             return self.font_3.render(ans, True, self.white)
         else:
             return self.font_2.render(ans, True, self.white)
@@ -155,6 +169,7 @@ class GameUI:
         self.screen.blit(answer_text_2, (answer_text_rect_2.x + self.answer_bg_xcoord, 755))
         self.screen.blit(answer_text_3, (answer_text_rect_3.x - self.answer_bg_xcoord, 855))
         self.screen.blit(answer_text_4, (answer_text_rect_4.x + self.answer_bg_xcoord, 855))
+        pygame.event.set_allowed(pygame.MOUSEBUTTONDOWN)
 
 
 class Game(GameUI):
@@ -164,7 +179,8 @@ class Game(GameUI):
         def manage_hover_click(mx, my, click):
             self.manage_help_tools_click(mx, my, click)
             if 937 > mx > 220 and 740 < my < 790:
-                if click:
+                if click and self.question_map[0]:
+                    pygame.event.set_blocked(pygame.MOUSEBUTTONDOWN)
                     res = self.answers.index(self.correct) == 0
                     self.answers_bg_1 = check_answers(res)
                     self.show_correct_or_false(res)
@@ -172,7 +188,8 @@ class Game(GameUI):
             else:
                 self.answers_bg_1 = pygame.image.load('res/img/answers.png')
             if 987 < mx < 1690 and 740 < my < 790:
-                if click:
+                if click and self.question_map[1]:
+                    pygame.event.set_blocked(pygame.MOUSEBUTTONDOWN)
                     res = self.answers.index(self.correct) == 1
                     self.answers_bg_2 = check_answers(res)
                     self.show_correct_or_false(res)
@@ -180,7 +197,8 @@ class Game(GameUI):
             else:
                 self.answers_bg_2 = pygame.image.load('res/img/answers.png')
             if 937 > mx > 220 and 840 < my < 900:
-                if click:
+                if click and self.question_map[2]:
+                    pygame.event.set_blocked(pygame.MOUSEBUTTONDOWN)
                     res = self.answers.index(self.correct) == 2
                     self.answers_bg_3 = check_answers(res)
                     self.show_correct_or_false(res)
@@ -188,7 +206,8 @@ class Game(GameUI):
             else:
                 self.answers_bg_3 = pygame.image.load('res/img/answers.png')
             if 987 < mx < 1690 and 840 < my < 900:
-                if click:
+                if click and self.question_map[3]:
+                    pygame.event.set_blocked(pygame.MOUSEBUTTONDOWN)
                     res = self.answers.index(self.correct) == 3
                     self.answers_bg_4 = check_answers(res)
                     self.show_correct_or_false(res)
@@ -213,7 +232,6 @@ class Game(GameUI):
                 self.render_question()
                 self.render_answers_background()
                 self.render_answers()
-
                 # refresh the page
                 pygame.display.flip()
 

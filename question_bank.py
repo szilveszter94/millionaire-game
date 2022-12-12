@@ -25,9 +25,9 @@ def generate_questions():
         question = html.unescape(difficulty[i - step]['question'])
         answers = difficulty[i - step]['incorrect_answers']
         answers = [html.unescape(i) for i in answers]
+        two_bad = [answers[0], answers[1]]
         correct = html.unescape(difficulty[i - step]['correct_answer'])
         answers.append(correct)
         random.shuffle(answers)
-        questions.append({"question": question, "answers": answers, "correct": correct})
+        questions.append({"question": question, "answers": answers, "correct": correct, "two_bad": two_bad})
     return questions
-
