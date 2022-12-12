@@ -169,7 +169,6 @@ class GameUI:
         self.screen.blit(answer_text_2, (answer_text_rect_2.x + self.answer_bg_xcoord, 755))
         self.screen.blit(answer_text_3, (answer_text_rect_3.x - self.answer_bg_xcoord, 855))
         self.screen.blit(answer_text_4, (answer_text_rect_4.x + self.answer_bg_xcoord, 855))
-        pygame.event.set_allowed(pygame.MOUSEBUTTONDOWN)
 
 
 class Game(GameUI):
@@ -180,7 +179,6 @@ class Game(GameUI):
             self.manage_help_tools_click(mx, my, click)
             if 937 > mx > 220 and 740 < my < 790:
                 if click and self.question_map[0]:
-                    pygame.event.set_blocked(pygame.MOUSEBUTTONDOWN)
                     res = self.answers.index(self.correct) == 0
                     self.answers_bg_1 = check_answers(res)
                     self.show_correct_or_false(res)
@@ -189,7 +187,6 @@ class Game(GameUI):
                 self.answers_bg_1 = pygame.image.load('res/img/answers.png')
             if 987 < mx < 1690 and 740 < my < 790:
                 if click and self.question_map[1]:
-                    pygame.event.set_blocked(pygame.MOUSEBUTTONDOWN)
                     res = self.answers.index(self.correct) == 1
                     self.answers_bg_2 = check_answers(res)
                     self.show_correct_or_false(res)
@@ -198,7 +195,6 @@ class Game(GameUI):
                 self.answers_bg_2 = pygame.image.load('res/img/answers.png')
             if 937 > mx > 220 and 840 < my < 900:
                 if click and self.question_map[2]:
-                    pygame.event.set_blocked(pygame.MOUSEBUTTONDOWN)
                     res = self.answers.index(self.correct) == 2
                     self.answers_bg_3 = check_answers(res)
                     self.show_correct_or_false(res)
@@ -207,7 +203,6 @@ class Game(GameUI):
                 self.answers_bg_3 = pygame.image.load('res/img/answers.png')
             if 987 < mx < 1690 and 840 < my < 900:
                 if click and self.question_map[3]:
-                    pygame.event.set_blocked(pygame.MOUSEBUTTONDOWN)
                     res = self.answers.index(self.correct) == 3
                     self.answers_bg_4 = check_answers(res)
                     self.show_correct_or_false(res)
