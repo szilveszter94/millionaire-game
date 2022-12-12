@@ -1,5 +1,6 @@
 import pygame, sys
 from question_bank import generate_questions
+import time
 
 
 def check_answers(res):
@@ -20,7 +21,7 @@ class GameUI:
         self.question_map = [True, True, True, True]
         self.questions = generate_questions()
         self.question_nr = 0
-        self.click = True
+        self.clicked = False
         self.answer_bg_xcoord = 360
         self.answer_bg_ycoord = 740
         self.question = self.questions[self.question_nr]['question']
@@ -42,8 +43,8 @@ class GameUI:
         self.answers_bg_1 = self.answers_bg_2 = self.answers_bg_3 = self.answers_bg_4 = pygame.image.load('res/img'
                                                                                                           '/answers.png')
 
-    def manage_help_tools_click(self, mx, my, click):
-        if click:
+    def manage_help_tools_click(self, mx, my):
+        if self.clicked:
             if 361 > mx > 212 and 143 < my < 237 and not self.half_cut:
                 self.half_cut = True
                 self.half_cut_function()
@@ -64,12 +65,12 @@ class GameUI:
         self.render_answers()
         pygame.display.flip()
         if res:
-            self.correct_sound.play(1)
-            pygame.time.wait(2000)
+            self.correct_sound.play(0)
+            pygame.time.delay(2000)
             self.correct_sound.stop()
         else:
-            self.wrong_sound.play(1)
-            pygame.time.wait(2000)
+            self.wrong_sound.play(0)
+            pygame.time.delay(2000)
             self.wrong_sound.stop()
         self.update_questions()
 
@@ -175,10 +176,10 @@ class Game(GameUI):
     def __init__(self):
         super().__init__()
 
-        def manage_hover_click(mx, my, click):
-            self.manage_help_tools_click(mx, my, click)
+        def manage_hover_click(mx, my):
+            self.manage_help_tools_click(mx, my)
             if 937 > mx > 220 and 740 < my < 790:
-                if click and self.question_map[0]:
+                if self.clicked and self.question_map[0]:
                     res = self.answers.index(self.correct) == 0
                     self.answers_bg_1 = check_answers(res)
                     self.show_correct_or_false(res)
@@ -186,7 +187,7 @@ class Game(GameUI):
             else:
                 self.answers_bg_1 = pygame.image.load('res/img/answers.png')
             if 987 < mx < 1690 and 740 < my < 790:
-                if click and self.question_map[1]:
+                if self.clicked and self.question_map[1]:
                     res = self.answers.index(self.correct) == 1
                     self.answers_bg_2 = check_answers(res)
                     self.show_correct_or_false(res)
@@ -194,7 +195,7 @@ class Game(GameUI):
             else:
                 self.answers_bg_2 = pygame.image.load('res/img/answers.png')
             if 937 > mx > 220 and 840 < my < 900:
-                if click and self.question_map[2]:
+                if self.clicked and self.question_map[2]:
                     res = self.answers.index(self.correct) == 2
                     self.answers_bg_3 = check_answers(res)
                     self.show_correct_or_false(res)
@@ -202,7 +203,7 @@ class Game(GameUI):
             else:
                 self.answers_bg_3 = pygame.image.load('res/img/answers.png')
             if 987 < mx < 1690 and 840 < my < 900:
-                if click and self.question_map[3]:
+                if self.clicked and self.question_map[3]:
                     res = self.answers.index(self.correct) == 3
                     self.answers_bg_4 = check_answers(res)
                     self.show_correct_or_false(res)
@@ -221,12 +222,15 @@ class Game(GameUI):
                         pygame.quit()
                         quit()
                     if event.type == pygame.MOUSEBUTTONDOWN:
-                        manage_hover_click(mx, my, True)
-                manage_hover_click(mx, my, False)
+                        pygame.event.set_blocked(pygame.MOUSEBUTTONDOWN)
+                        self.clicked = True
+                manage_hover_click(mx, my)
                 self.render_background()
                 self.render_question()
                 self.render_answers_background()
                 self.render_answers()
+                pygame.event.set_allowed(pygame.MOUSEBUTTONDOWN)
+                self.clicked = False
                 # refresh the page
                 pygame.display.flip()
 
