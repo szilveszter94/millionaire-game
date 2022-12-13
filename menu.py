@@ -8,6 +8,7 @@ class UserInterface:
         # Init pygame and mixer
         pygame.init()
         pygame.mixer.init()
+        self.menu = True
 
         # set constants for the menu
         self.size = self.width, self.height = 1920, 1080
@@ -54,9 +55,8 @@ class Menu(UserInterface):
         # menu function
         def game_menu():
             # start the menu sound and looping
-            menu = True
             self.menu_sound.play(-1)
-            while menu:
+            while self.menu:
                 # set variables for mouse coordinates
                 mx, my = pygame.mouse.get_pos()
                 # manage quit game
@@ -67,7 +67,7 @@ class Menu(UserInterface):
                     # manage play button
                     if 1289 > mx > self.play_rect.x and 740 > my > 700:
                         if event.type == pygame.MOUSEBUTTONDOWN:
-                            menu = False
+                            self.menu = False
                             self.menu_sound.stop()
                             pygame.time.wait(1000)
                             Game()

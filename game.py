@@ -15,6 +15,7 @@ class GameUI:
     def __init__(self):
         pygame.init()
         pygame.mixer.init()
+        self.game = True
         self.correct_sound = pygame.mixer.Sound('res/sound/correct_sound.mp3')
         self.wrong_sound = pygame.mixer.Sound('res/sound/wrong_sound.mp3')
         self.gold = '#FFBF00'
@@ -28,6 +29,8 @@ class GameUI:
         self.answers = self.questions[self.question_nr]['answers']
         self.correct = self.questions[self.question_nr]['correct']
         self.size = self.width, self.height = 1920, 1080
+        self.prizes = [100, 200, 300, 500, 1000, 2000, 4000, 8000, 16000, 32000, 64000, 125000, 250000, 500000, 1000000]
+        self.y_coord = [i for i in range(498,123,-25)]
         self.white = '#ffffff'
         self.graph = self.clicked = self.half_cut = self.phone = self.audience = self.show_phone_result = False
         self.bg_image = pygame.image.load('res/img/bg_image.png')
@@ -38,6 +41,7 @@ class GameUI:
         self.audience_sound = pygame.mixer.Sound('res/sound/ask_the_audience.mp3')
         self.phone_sound = pygame.mixer.Sound('res/sound/phone_sound.mp3')
         self.random_arr = []
+        self.score_bg = pygame.image.load('res/img/score_bg.png')
         self.font = pygame.font.Font('freesansbold.ttf', 28)
         self.font_2 = pygame.font.Font('freesansbold.ttf', 24)
         self.font_3 = pygame.font.Font('freesansbold.ttf', 20)
@@ -91,22 +95,22 @@ class Game(GameUI):
             ans_b = self.font_2.render("B", True, self.white)
             ans_c = self.font_2.render("C", True, self.white)
             ans_d = self.font_2.render("D", True, self.white)
-            self.screen.blit(ans_a, (313, 410))
-            self.screen.blit(ans_b, (373, 410))
-            self.screen.blit(ans_c, (433, 410))
-            self.screen.blit(ans_d, (493, 410))
+            self.screen.blit(ans_a, (353, 410))
+            self.screen.blit(ans_b, (413, 410))
+            self.screen.blit(ans_c, (473, 410))
+            self.screen.blit(ans_d, (533, 410))
             pygame.draw.rect(self.screen, [20, 50 + 2 * self.random_arr[0], 50],
-                             pygame.Rect(300, 400 - self.random_arr[0], 40, self.random_arr[0]))
+                             pygame.Rect(340, 400 - self.random_arr[0], 40, self.random_arr[0]))
             pygame.draw.rect(self.screen, [20, 50 + 2 * self.random_arr[1], 50],
-                             pygame.Rect(360, 400 - self.random_arr[1], 40, self.random_arr[1]))
+                             pygame.Rect(400, 400 - self.random_arr[1], 40, self.random_arr[1]))
             pygame.draw.rect(self.screen, [20, 50 + 2 * self.random_arr[2], 50],
-                             pygame.Rect(420, 400 - self.random_arr[2], 40, self.random_arr[2]))
+                             pygame.Rect(460, 400 - self.random_arr[2], 40, self.random_arr[2]))
             pygame.draw.rect(self.screen, [20, 50 + 2 * self.random_arr[3], 50],
-                             pygame.Rect(480, 400 - self.random_arr[3], 40, self.random_arr[3]))
-            pygame.draw.rect(self.screen, self.purple, pygame.Rect(300, 300, 40, 100), 1)
-            pygame.draw.rect(self.screen, self.purple, pygame.Rect(360, 300, 40, 100), 1)
-            pygame.draw.rect(self.screen, self.purple, pygame.Rect(420, 300, 40, 100), 1)
-            pygame.draw.rect(self.screen, self.purple, pygame.Rect(480, 300, 40, 100), 1)
+                             pygame.Rect(520, 400 - self.random_arr[3], 40, self.random_arr[3]))
+            pygame.draw.rect(self.screen, self.purple, pygame.Rect(340, 300, 40, 100), 1)
+            pygame.draw.rect(self.screen, self.purple, pygame.Rect(400, 300, 40, 100), 1)
+            pygame.draw.rect(self.screen, self.purple, pygame.Rect(460, 300, 40, 100), 1)
+            pygame.draw.rect(self.screen, self.purple, pygame.Rect(520, 300, 40, 100), 1)
 
         def audience_function():
             self.random_arr = create_random_list(self.answers, self.correct)
@@ -140,6 +144,9 @@ class Game(GameUI):
                 self.wrong_sound.play(1)
                 pygame.time.delay(2000)
                 self.wrong_sound.stop()
+                self.game = False
+                sys.exit()
+
             pygame.event.clear()
             pygame.event.set_allowed(pygame.MOUSEBUTTONDOWN)
             update_questions()
@@ -170,6 +177,21 @@ class Game(GameUI):
             self.question_map = [True, True, True, True]
             self.graph = self.show_phone_result = False
 
+        def render_prizes():
+            self.screen.blit(self.score_bg, (1390, self.y_coord[self.question_nr]))
+            prize_surfaces = []
+            for i in range(len(self.prizes)):
+                if (i + 1) % 5 == 0:
+                    color = self.white
+                else:
+                    color = self.gold
+                item = self.font_2.render(f'{i+1}: $ {self.prizes[i]}', True, color)
+                prize_surfaces.append(item)
+            step = 0
+            for i in range(len(prize_surfaces)):
+                self.screen.blit(prize_surfaces[i], (1400, 500-step))
+                step += 25
+
         def render_background():
             question_bg = pygame.image.load('res/img/question.png')
             question_bg_rect = question_bg.get_rect()
@@ -185,6 +207,7 @@ class Game(GameUI):
                 self.screen.blit(self.remove_help, (542, 152))
             if self.graph:
                 draw_audience_result()
+            render_prizes()
 
         def render_question():
             if len(self.question) > 86:
@@ -283,9 +306,9 @@ class Game(GameUI):
 
         def start_game():
             # start the menu sound and looping
-            game = True
+            self.game = True
             self.game_sound.play(-1)
-            while game:
+            while self.game:
                 mx, my = pygame.mouse.get_pos()
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
