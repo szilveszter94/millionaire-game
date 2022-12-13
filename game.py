@@ -64,14 +64,17 @@ class GameUI:
         self.render_answers_background()
         self.render_answers()
         pygame.display.flip()
+        pygame.event.set_blocked(pygame.MOUSEBUTTONDOWN)
         if res:
-            self.correct_sound.play(0)
+            self.correct_sound.play(1)
             pygame.time.delay(2000)
             self.correct_sound.stop()
         else:
-            self.wrong_sound.play(0)
+            self.wrong_sound.play(1)
             pygame.time.delay(2000)
             self.wrong_sound.stop()
+        pygame.event.clear()
+        pygame.event.set_allowed(pygame.MOUSEBUTTONDOWN)
         self.update_questions()
 
     def render_background(self):
@@ -222,14 +225,12 @@ class Game(GameUI):
                         pygame.quit()
                         quit()
                     if event.type == pygame.MOUSEBUTTONDOWN:
-                        pygame.event.set_blocked(pygame.MOUSEBUTTONDOWN)
                         self.clicked = True
                 manage_hover_click(mx, my)
                 self.render_background()
                 self.render_question()
                 self.render_answers_background()
                 self.render_answers()
-                pygame.event.set_allowed(pygame.MOUSEBUTTONDOWN)
                 self.clicked = False
                 # refresh the page
                 pygame.display.flip()
