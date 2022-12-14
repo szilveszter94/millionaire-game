@@ -29,8 +29,9 @@ class GameUI:
         self.answers = self.questions[self.question_nr]['answers']
         self.correct = self.questions[self.question_nr]['correct']
         self.size = self.width, self.height = 1920, 1080
-        self.prizes = [100, 200, 300, 500, 1000, 2000, 4000, 8000, 16000, 32000, 64000, 125000, 250000, 500000, 1000000]
-        self.y_coord = [i for i in range(498,123,-25)]
+        self.prizes = ["100", "200", "300", "500", "1,000", "2,000", "4,000", "8,000",
+                       "16,000", "32,000", "64,000", "125,000", "250,000", "500,000", "1,000,000"]
+        self.y_coord = [i for i in range(498, 123, -25)]
         self.white = '#ffffff'
         self.graph = self.clicked = self.half_cut = self.phone = self.audience = self.show_phone_result = False
         self.bg_image = pygame.image.load('res/img/bg_image.png')
@@ -112,6 +113,23 @@ class Game(GameUI):
             pygame.draw.rect(self.screen, self.purple, pygame.Rect(460, 300, 40, 100), 1)
             pygame.draw.rect(self.screen, self.purple, pygame.Rect(520, 300, 40, 100), 1)
 
+        def game_over(final_score):
+            if self.question_nr >= 9:
+                render_score = self.font.render(f'Congratulations! Your final score is: $ {final_score}', True,
+                                                self.gold)
+                render_score_rect = render_score.get_rect()
+                render_score_rect.center = self.screen_center
+            else:
+                render_score = self.font.render(f'Unfortunately your final score is: $ {final_score}', True,
+                                                self.gold)
+                render_score_rect = render_score.get_rect()
+                render_score_rect.center = self.screen_center
+            self.screen.blit(render_score, (render_score_rect.x, render_score_rect.y))
+            pygame.display.flip()
+            pygame.time.delay(3000)
+            self.game_sound.stop()
+            self.game = False
+
         def audience_function():
             self.random_arr = create_random_list(self.answers, self.correct)
             self.graph = True
@@ -144,8 +162,15 @@ class Game(GameUI):
                 self.wrong_sound.play(1)
                 pygame.time.delay(2000)
                 self.wrong_sound.stop()
-                self.game = False
-                sys.exit()
+                self.screen.blit(self.bg_image, (0, 0))
+                final_score = 0
+                if self.question_nr == 14:
+                    final_score = self.prizes[14]
+                elif self.question_nr >= 9:
+                    final_score = self.prizes[9]
+                elif self.question_nr >= 5:
+                    final_score = self.prizes[4]
+                game_over(final_score)
 
             pygame.event.clear()
             pygame.event.set_allowed(pygame.MOUSEBUTTONDOWN)
@@ -169,7 +194,7 @@ class Game(GameUI):
 
         def update_questions():
             if self.question_nr >= 14:
-                sys.exit()
+                game_over(self.prizes[14])
             self.question_nr += 1
             self.question = self.questions[self.question_nr]['question']
             self.answers = self.questions[self.question_nr]['answers']
@@ -185,11 +210,11 @@ class Game(GameUI):
                     color = self.white
                 else:
                     color = self.gold
-                item = self.font_2.render(f'{i+1}: $ {self.prizes[i]}', True, color)
+                item = self.font_2.render(f'{i + 1}: $ {self.prizes[i]}', True, color)
                 prize_surfaces.append(item)
             step = 0
             for i in range(len(prize_surfaces)):
-                self.screen.blit(prize_surfaces[i], (1400, 500-step))
+                self.screen.blit(prize_surfaces[i], (1400, 500 - step))
                 step += 25
 
         def render_background():
@@ -306,7 +331,6 @@ class Game(GameUI):
 
         def start_game():
             # start the menu sound and looping
-            self.game = True
             self.game_sound.play(-1)
             while self.game:
                 mx, my = pygame.mouse.get_pos()
@@ -325,7 +349,7 @@ class Game(GameUI):
                 # refresh the page
                 pygame.display.flip()
 
-        while True:
+        while self.game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT: sys.exit()
             start_game()

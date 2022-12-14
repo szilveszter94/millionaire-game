@@ -1,6 +1,5 @@
 import pygame
 import sys
-from game import Game
 
 
 class UserInterface:
@@ -70,7 +69,6 @@ class Menu(UserInterface):
                             self.menu = False
                             self.menu_sound.stop()
                             pygame.time.wait(1000)
-                            Game()
                     # manage exit button
                     if 1289 > mx > self.play_rect.x and 790 > my > 750:
                         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -96,7 +94,7 @@ class Menu(UserInterface):
                 # refresh the page
                 pygame.display.flip()
 
-        while True:
+        while self.menu:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT: sys.exit()
             game_menu()

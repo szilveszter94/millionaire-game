@@ -1,4 +1,6 @@
 from menu import Menu
+from game import Game
 
-if __name__ == "__main__":
-    Menu()
+while True:
+    menu = Menu()
+    game = Game()

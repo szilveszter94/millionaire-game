@@ -4,9 +4,9 @@ import random
 
 
 def generate_questions():
-    response_easy = requests.get('https://opentdb.com/api.php?amount=5&difficulty=easy&type=multiple')
-    response_medium = requests.get('https://opentdb.com/api.php?amount=5&difficulty=medium&type=multiple')
-    response_hard = requests.get('https://opentdb.com/api.php?amount=5&difficulty=hard&type=multiple')
+    response_easy = requests.get('https://opentdb.com/api.php?category=23&amount=5&difficulty=easy&type=multiple')
+    response_medium = requests.get('https://opentdb.com/api.php?category=23&amount=5&difficulty=medium&type=multiple')
+    response_hard = requests.get('https://opentdb.com/api.php?category=23&amount=5&difficulty=hard&type=multiple')
 
     questions = []
 
