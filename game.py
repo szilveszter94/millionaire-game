@@ -45,6 +45,8 @@ class GameUI:
         self.phone_sound = pygame.mixer.Sound('res/sound/phone_sound.mp3')
         self.random_arr = []
         self.score_bg = pygame.image.load('res/img/score_bg.png')
+        self.stand = pygame.image.load('res/img/stand.png')
+        self.stand_rect = self.stand.get_rect()
         self.fonts = [pygame.font.Font('freesansbold.ttf', i) for i in range(16, 29, 4)]
         self.help_tools = pygame.image.load('res/img/help_tools.png')
         self.remove_help = pygame.image.load('res/img/remove_help.png')
@@ -80,7 +82,7 @@ class Game(GameUI):
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_RETURN:
                             if len(user_text) > 0:
-                                self.nickname = user_text
+                                self.nickname = user_text[0:14]
                                 self.ask_name = False
                         # Check for backspace
                         if event.key == pygame.K_BACKSPACE:
@@ -131,6 +133,8 @@ class Game(GameUI):
                 if 686 > mx > 536 and 143 < my < 237 and not self.audience:
                     self.audience = True
                     audience_function()
+                if 1362 > mx > 1211 and 143 < my < 237 and self.question_nr > 0:
+                    game_over(self.prizes[self.question_nr - 1])
 
         def phone_function():
             self.game_sound.stop()
@@ -164,6 +168,7 @@ class Game(GameUI):
                 x_coor += 60
 
         def game_over(final_score):
+            self.screen.blit(self.bg_image, (0, 0))
             if self.question_nr >= 9:
                 render_score = self.fonts[3].render(f'Congratulations! Your final score is: $ {final_score}', True,
                                                     self.gold)
@@ -214,7 +219,6 @@ class Game(GameUI):
                 self.wrong_sound.play(1)
                 pygame.time.delay(2000)
                 self.wrong_sound.stop()
-                self.screen.blit(self.bg_image, (0, 0))
                 final_score = '0'
                 if self.question_nr == 14:
                     final_score = self.prizes[14]
@@ -275,6 +279,8 @@ class Game(GameUI):
             self.screen.blit(self.bg_image, (0, 0))
             self.screen.blit(question_bg, (question_bg_rect.x, 580))
             self.screen.blit(self.help_tools, (210, 140))
+            if self.question_nr > 0:
+                self.screen.blit(self.stand, (1210, 140))
             if self.half_cut:
                 self.screen.blit(self.remove_help, (222, 152))
             if self.phone:

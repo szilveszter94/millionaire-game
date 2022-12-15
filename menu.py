@@ -2,6 +2,7 @@ import pygame
 import sys
 from highscore import read_highscores
 
+
 class UserInterface:
     def __init__(self):
         # Init pygame and mixer
@@ -11,7 +12,8 @@ class UserInterface:
 
         # set constants for the menu
         self.size = self.width, self.height = 1920, 1080
-        self.white = "#ffffff"
+        self.white, self.purple, self.gold, self.silver, self.bronze = "#ffffff", \
+                                                                       '#810CA8', '#FFBF00', '#B2B2B2', '#C58940'
         self.font = pygame.font.Font('freesansbold.ttf', 32)
         self.screen = pygame.display.set_mode(self.size)
         self.screen_center = self.screen.get_rect().center
@@ -73,11 +75,34 @@ class Menu(UserInterface):
         self.screen.blit(back_style, (self.exit_game_rect.x, 800))
         highscores = read_highscores()
         y_coord = 0
+        nickname = self.font.render("Nickname", True, self.white)
+        amount = self.font.render("Amount", True, self.white)
+        date = self.font.render("Date", True, self.white)
+        self.screen.blit(nickname, (540, 250))
+        self.screen.blit(amount, (900, 250))
+        self.screen.blit(date, (1220, 250))
         for i in range(len(highscores)):
-            score = self.font.render(f'{i+1}: {highscores[i]["name"]},  $ {highscores[i]["val"]},   {highscores[i]["date"]}',
-                                     True, self.white)
-            self.screen.blit(score, (730, 300 + y_coord))
-            y_coord += 50
+            if y_coord == 0:
+                color = self.gold
+            elif y_coord == 60:
+                color = self.silver
+            elif y_coord == 120:
+                color = self.bronze
+            else:
+                color = self.purple
+            pygame.draw.rect(self.screen, color, pygame.Rect(460, 300 + y_coord, 40, 48))
+            pygame.draw.rect(self.screen, self.purple, pygame.Rect(510, 300 + y_coord, 350, 48), 2)
+            pygame.draw.rect(self.screen, self.purple, pygame.Rect(870, 300 + y_coord, 300, 48), 2)
+            pygame.draw.rect(self.screen, self.purple, pygame.Rect(1180, 300 + y_coord, 250, 48), 2)
+            score = self.font.render(f'{i + 1}', True, self.white)
+            name = self.font.render(f'{highscores[i]["name"]}', True, self.white)
+            val = self.font.render(f'$ {format(highscores[i]["val"], ",")}', True, self.white)
+            date = self.font.render(f'{highscores[i]["date"]}', True, self.white)
+            self.screen.blit(score, (470, 310 + y_coord))
+            self.screen.blit(name, (540, 310 + y_coord))
+            self.screen.blit(val, (910, 310 + y_coord))
+            self.screen.blit(date, (1220, 310 + y_coord))
+            y_coord += 60
 
     def __init__(self):
         super().__init__()
