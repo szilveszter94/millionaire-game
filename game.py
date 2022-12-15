@@ -1,6 +1,7 @@
 import pygame, sys
 from question_bank import generate_questions
 from audience_graph_generator import create_random_list
+from highscore import write_highscore
 
 
 def check_answers(res):
@@ -15,7 +16,10 @@ class GameUI:
     def __init__(self):
         pygame.init()
         pygame.mixer.init()
+        self.nickname = "Anonymous"
         self.game = True
+        self.ask_name = True
+        self.fps = 60
         self.correct_sound = pygame.mixer.Sound('res/sound/correct_sound.mp3')
         self.wrong_sound = pygame.mixer.Sound('res/sound/wrong_sound.mp3')
         self.gold, self.purple, self.white = '#FFBF00', '#810CA8', '#ffffff'
@@ -52,6 +56,69 @@ class Game(GameUI):
     def __init__(self):
         super().__init__()
 
+        def ask_the_nickname():
+            user_text = ''
+            input_rect = pygame.Rect(830, 600, 250, 32)
+            color_active = '#C147E9'
+
+            # color_passive store color(chartreuse4) which is
+            # color of input box.
+            color_passive = '#810CA8'
+            color = color_passive
+
+            active = False
+            while self.ask_name:
+
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        if input_rect.collidepoint(event.pos):
+                            active = True
+                        else:
+                            active = False
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_RETURN:
+                            if len(user_text) > 0:
+                                self.nickname = user_text
+                                self.ask_name = False
+                        # Check for backspace
+                        if event.key == pygame.K_BACKSPACE:
+
+                            # get text input from 0 to -1 i.e. end.
+                            user_text = user_text[:-1]
+
+                        # Unicode standard is used for string
+                        # formation
+                        else:
+                            user_text += event.unicode
+                    self.screen.blit(self.bg_image, (0, 0))
+
+                    if active:
+                        color = color_active
+                    else:
+                        color = color_passive
+
+                    # draw rectangle and argument passed which should
+                    # be on screen
+                    pygame.draw.rect(self.screen, color, input_rect)
+                    write_your_name = self.fonts[3].render("Write your nickname and press enter: ", True, self.white)
+                    write_your_name_rect = write_your_name.get_rect()
+                    write_your_name_rect.center = self.screen_center
+                    text_surface = self.fonts[3].render(user_text, True, self.white)
+
+                    # render at position stated in arguments
+                    self.screen.blit(write_your_name, (write_your_name_rect.x, 550))
+                    self.screen.blit(text_surface, (input_rect.x + 5, input_rect.y + 5))
+
+                    # set width of textfield so that text cannot get
+                    # outside of user's text input
+                    input_rect.w = max(250, text_surface.get_width() + 10)
+
+                    # display.flip() will update only a portion of the
+                    # screen to updated, not full area
+                    pygame.display.flip()
+
         def manage_help_tools_click(mx, my):
             if self.clicked:
                 if 361 > mx > 212 and 143 < my < 237 and not self.half_cut:
@@ -76,9 +143,6 @@ class Game(GameUI):
             self.game_sound.play(-1)
             self.show_phone_result = True
 
-        def save_highscore(score):
-            print(score)
-        
         def render_phone_result():
             if self.answers.index(self.correct) == 0:
                 self.answers_bg_1 = pygame.image.load('res/img/answers_hover.png')
@@ -112,8 +176,8 @@ class Game(GameUI):
                 render_score_rect.center = self.screen_center
             self.screen.blit(render_score, (render_score_rect.x, render_score_rect.y))
             pygame.display.flip()
+            write_highscore([self.nickname, int(final_score.replace(',', ''))])
             pygame.time.delay(3000)
-            save_highscore(final_score)
             self.game_sound.stop()
             self.game = False
 
@@ -151,7 +215,7 @@ class Game(GameUI):
                 pygame.time.delay(2000)
                 self.wrong_sound.stop()
                 self.screen.blit(self.bg_image, (0, 0))
-                final_score = 0
+                final_score = '0'
                 if self.question_nr == 14:
                     final_score = self.prizes[14]
                 elif self.question_nr >= 9:
@@ -302,6 +366,8 @@ class Game(GameUI):
 
         def start_game():
             # start the menu sound and looping
+            if self.ask_name:
+                ask_the_nickname()
             self.game_sound.play(-1)
             while self.game:
                 mx, my = pygame.mouse.get_pos()
@@ -319,6 +385,7 @@ class Game(GameUI):
                 self.clicked = False
                 # refresh the page
                 pygame.display.flip()
+                pygame.time.Clock().tick(self.fps)
 
         while self.game:
             for event in pygame.event.get():

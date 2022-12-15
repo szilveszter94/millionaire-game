@@ -1,6 +1,6 @@
 import pygame
 import sys
-
+from highscore import read_highscores
 
 class UserInterface:
     def __init__(self):
@@ -15,6 +15,8 @@ class UserInterface:
         self.font = pygame.font.Font('freesansbold.ttf', 32)
         self.screen = pygame.display.set_mode(self.size)
         self.screen_center = self.screen.get_rect().center
+        self.show_high_score = False
+        self.fps = 60
 
         # load menu sound
         self.menu_sound = pygame.mixer.Sound("res/sound/menu_sound.mp3")
@@ -46,9 +48,37 @@ class UserInterface:
         self.exit_game_hover = pygame.image.load('res/img/exit_2.png')
         self.exit_game_rect = self.exit_game.get_rect()
         self.exit_game_rect.center = self.screen_center
+        self.high_score = pygame.image.load('res/img/highscores.png')
+        self.high_score_hover = pygame.image.load('res/img/highscores_hover.png')
+        self.high_score_rect = self.exit_game.get_rect()
+        self.high_score_rect.center = self.screen_center
+        self.back = pygame.image.load('res/img/back.png')
+        self.back_hover = pygame.image.load('res/img/back_hover.png')
+        self.back_rect = self.exit_game.get_rect()
+        self.back_rect.center = self.screen_center
 
 
 class Menu(UserInterface):
+
+    def show_high_score_function(self, mx, my, event):
+
+        if 1289 > mx > self.play_rect.x and 840 > my > 800:
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                self.show_high_score = False
+        self.screen.blit(self.bg_image, (0, 0))
+        if 1289 > mx > self.play_rect.x and 840 > my > 800:
+            back_style = self.back_hover
+        else:
+            back_style = self.back
+        self.screen.blit(back_style, (self.exit_game_rect.x, 800))
+        highscores = read_highscores()
+        y_coord = 0
+        for i in range(len(highscores)):
+            score = self.font.render(f'{i+1}: {highscores[i]["name"]},  $ {highscores[i]["val"]},   {highscores[i]["date"]}',
+                                     True, self.white)
+            self.screen.blit(score, (730, 300 + y_coord))
+            y_coord += 50
+
     def __init__(self):
         super().__init__()
 
@@ -73,27 +103,41 @@ class Menu(UserInterface):
                     # manage exit button
                     if 1289 > mx > self.play_rect.x and 790 > my > 750:
                         if event.type == pygame.MOUSEBUTTONDOWN:
-                            sys.exit()
+                            self.show_high_score = True
+                    if 1289 > mx > self.play_rect.x and 840 > my > 800:
+                        if event.type == pygame.MOUSEBUTTONDOWN:
+                            if not self.show_high_score:
+                                sys.exit()
+                    if self.show_high_score:
+                        self.show_high_score_function(mx, my, event)
                 # show background image
-                self.screen.blit(self.bg_image, (0, 0))
+                if not self.show_high_score:
+                    self.screen.blit(self.bg_image, (0, 0))
                 # manage play button hover
                 if 1289 > mx > self.play_rect.x and 740 > my > 700:
                     start_game = self.play_hover
                 else:
                     start_game = self.play
-                # manage exit button hover
+                # manage highscore and exit button hover
                 if 1289 > mx > self.play_rect.x and 790 > my > 750:
+                    high_score_style = self.high_score_hover
+                else:
+                    high_score_style = self.high_score
+                if 1289 > mx > self.play_rect.x and 840 > my > 800:
                     exit_game_style = self.exit_game_hover
                 else:
                     exit_game_style = self.exit_game
                 # show title, subtitle, welcome text, play and exit buttons
-                self.screen.blit(self.title, (self.title_rect.x, 190))
-                self.screen.blit(self.subtitle, (self.subtitle_text_rect.x, 600))
-                self.screen.blit(self.welcome_text, (self.welcome_text_rect.x, 550))
-                self.screen.blit(start_game, (self.play_rect.x, 700))
-                self.screen.blit(exit_game_style, (self.exit_game_rect.x, 750))
+                if not self.show_high_score:
+                    self.screen.blit(self.title, (self.title_rect.x, 190))
+                    self.screen.blit(self.subtitle, (self.subtitle_text_rect.x, 600))
+                    self.screen.blit(self.welcome_text, (self.welcome_text_rect.x, 550))
+                    self.screen.blit(start_game, (self.play_rect.x, 700))
+                    self.screen.blit(high_score_style, (self.high_score_rect.x, 750))
+                    self.screen.blit(exit_game_style, (self.exit_game_rect.x, 800))
                 # refresh the page
                 pygame.display.flip()
+                pygame.time.Clock().tick(self.fps)
 
         while self.menu:
             for event in pygame.event.get():
