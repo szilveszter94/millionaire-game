@@ -14,6 +14,7 @@ class UserInterface:
         self.white = "#ffffff"
         self.font = pygame.font.Font('freesansbold.ttf', 32)
         self.screen = pygame.display.set_mode(self.size)
+        self.screen_center = self.screen.get_rect().center
 
         # load menu sound
         self.menu_sound = pygame.mixer.Sound("res/sound/menu_sound.mp3")
@@ -24,27 +25,27 @@ class UserInterface:
         # initialize title and title center for align center
         self.title = pygame.image.load('res/img/title.png')
         self.title_rect = self.title.get_rect()
-        self.title_rect.center = self.screen.get_rect().center
+        self.title_rect.center = self.screen_center
 
         # initialize subtitle text and center for align center
         self.subtitle = self.font.render('Who wants to be a millionaire?', True, self.white)
         self.subtitle_text_rect = self.subtitle.get_rect()
-        self.subtitle_text_rect.center = self.screen.get_rect().center
+        self.subtitle_text_rect.center = self.screen_center
 
         # initialize welcome text and center for align center
         self.welcome_text = self.font.render('Welcome to', True, self.white)
         self.welcome_text_rect = self.welcome_text.get_rect()
-        self.welcome_text_rect.center = self.screen.get_rect().center
+        self.welcome_text_rect.center = self.screen_center
 
         # set play and exit buttons
         self.play = pygame.image.load('res/img/play.png')
-        self.play_2 = pygame.image.load('res/img/play2.png')
+        self.play_hover = pygame.image.load('res/img/play2.png')
         self.play_rect = self.play.get_rect()
-        self.play_rect.center = self.screen.get_rect().center
+        self.play_rect.center = self.screen_center
         self.exit_game = pygame.image.load('res/img/exit.png')
-        self.exit_game_2 = pygame.image.load('res/img/exit_2.png')
+        self.exit_game_hover = pygame.image.load('res/img/exit_2.png')
         self.exit_game_rect = self.exit_game.get_rect()
-        self.exit_game_rect.center = self.screen.get_rect().center
+        self.exit_game_rect.center = self.screen_center
 
 
 class Menu(UserInterface):
@@ -77,12 +78,12 @@ class Menu(UserInterface):
                 self.screen.blit(self.bg_image, (0, 0))
                 # manage play button hover
                 if 1289 > mx > self.play_rect.x and 740 > my > 700:
-                    start_game = self.play_2
+                    start_game = self.play_hover
                 else:
                     start_game = self.play
                 # manage exit button hover
                 if 1289 > mx > self.play_rect.x and 790 > my > 750:
-                    exit_game_style = self.exit_game_2
+                    exit_game_style = self.exit_game_hover
                 else:
                     exit_game_style = self.exit_game
                 # show title, subtitle, welcome text, play and exit buttons

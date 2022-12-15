@@ -18,8 +18,7 @@ class GameUI:
         self.game = True
         self.correct_sound = pygame.mixer.Sound('res/sound/correct_sound.mp3')
         self.wrong_sound = pygame.mixer.Sound('res/sound/wrong_sound.mp3')
-        self.gold = '#FFBF00'
-        self.purple = [129, 12, 168]
+        self.gold, self.purple, self.white = '#FFBF00', '#810CA8', '#ffffff'
         self.question_map = [True, True, True, True]
         self.questions = generate_questions()
         self.question_nr = 0
@@ -32,7 +31,6 @@ class GameUI:
         self.prizes = ["100", "200", "300", "500", "1,000", "2,000", "4,000", "8,000",
                        "16,000", "32,000", "64,000", "125,000", "250,000", "500,000", "1,000,000"]
         self.y_coord = [i for i in range(498, 123, -25)]
-        self.white = '#ffffff'
         self.graph = self.clicked = self.half_cut = self.phone = self.audience = self.show_phone_result = False
         self.bg_image = pygame.image.load('res/img/bg_image.png')
         self.screen = pygame.display.set_mode(self.size)
@@ -43,10 +41,7 @@ class GameUI:
         self.phone_sound = pygame.mixer.Sound('res/sound/phone_sound.mp3')
         self.random_arr = []
         self.score_bg = pygame.image.load('res/img/score_bg.png')
-        self.font = pygame.font.Font('freesansbold.ttf', 28)
-        self.font_2 = pygame.font.Font('freesansbold.ttf', 24)
-        self.font_3 = pygame.font.Font('freesansbold.ttf', 20)
-        self.font_4 = pygame.font.Font('freesansbold.ttf', 16)
+        self.fonts = [pygame.font.Font('freesansbold.ttf', i) for i in range(16, 29, 4)]
         self.help_tools = pygame.image.load('res/img/help_tools.png')
         self.remove_help = pygame.image.load('res/img/remove_help.png')
         self.answers_bg_1 = self.answers_bg_2 = self.answers_bg_3 = self.answers_bg_4 = pygame.image.load('res/img'
@@ -81,52 +76,44 @@ class Game(GameUI):
             self.game_sound.play(-1)
             self.show_phone_result = True
 
+        def save_highscore(score):
+            print(score)
+        
         def render_phone_result():
             if self.answers.index(self.correct) == 0:
-                self.answers_bg_1 = pygame.image.load('res/img/phone_help.png')
+                self.answers_bg_1 = pygame.image.load('res/img/answers_hover.png')
             if self.answers.index(self.correct) == 1:
-                self.answers_bg_2 = pygame.image.load('res/img/phone_help.png')
+                self.answers_bg_2 = pygame.image.load('res/img/answers_hover.png')
             if self.answers.index(self.correct) == 2:
-                self.answers_bg_3 = pygame.image.load('res/img/phone_help.png')
+                self.answers_bg_3 = pygame.image.load('res/img/answers_hover.png')
             if self.answers.index(self.correct) == 3:
-                self.answers_bg_4 = pygame.image.load('res/img/phone_help.png')
+                self.answers_bg_4 = pygame.image.load('res/img/answers_hover.png')
 
         def draw_audience_result():
-            ans_a = self.font_2.render("A", True, self.white)
-            ans_b = self.font_2.render("B", True, self.white)
-            ans_c = self.font_2.render("C", True, self.white)
-            ans_d = self.font_2.render("D", True, self.white)
-            self.screen.blit(ans_a, (353, 410))
-            self.screen.blit(ans_b, (413, 410))
-            self.screen.blit(ans_c, (473, 410))
-            self.screen.blit(ans_d, (533, 410))
-            pygame.draw.rect(self.screen, [20, 50 + 2 * self.random_arr[0], 50],
-                             pygame.Rect(340, 400 - self.random_arr[0], 40, self.random_arr[0]))
-            pygame.draw.rect(self.screen, [20, 50 + 2 * self.random_arr[1], 50],
-                             pygame.Rect(400, 400 - self.random_arr[1], 40, self.random_arr[1]))
-            pygame.draw.rect(self.screen, [20, 50 + 2 * self.random_arr[2], 50],
-                             pygame.Rect(460, 400 - self.random_arr[2], 40, self.random_arr[2]))
-            pygame.draw.rect(self.screen, [20, 50 + 2 * self.random_arr[3], 50],
-                             pygame.Rect(520, 400 - self.random_arr[3], 40, self.random_arr[3]))
-            pygame.draw.rect(self.screen, self.purple, pygame.Rect(340, 300, 40, 100), 1)
-            pygame.draw.rect(self.screen, self.purple, pygame.Rect(400, 300, 40, 100), 1)
-            pygame.draw.rect(self.screen, self.purple, pygame.Rect(460, 300, 40, 100), 1)
-            pygame.draw.rect(self.screen, self.purple, pygame.Rect(520, 300, 40, 100), 1)
+            ans_letter = [self.fonts[2].render(f"{chr(i)}", True, self.gold) for i in range(ord("A"), ord("E"))]
+            x_coor = 0
+            for i in range(4):
+                self.screen.blit(ans_letter[i], (353 + x_coor, 410))
+                pygame.draw.rect(self.screen, [20, 50 + 2 * self.random_arr[i], 50],
+                                 pygame.Rect(340 + x_coor, 400 - self.random_arr[i], 40, self.random_arr[i]))
+                pygame.draw.rect(self.screen, self.purple, pygame.Rect(340 + x_coor, 300, 40, 100), 1)
+                x_coor += 60
 
         def game_over(final_score):
             if self.question_nr >= 9:
-                render_score = self.font.render(f'Congratulations! Your final score is: $ {final_score}', True,
-                                                self.gold)
+                render_score = self.fonts[3].render(f'Congratulations! Your final score is: $ {final_score}', True,
+                                                    self.gold)
                 render_score_rect = render_score.get_rect()
                 render_score_rect.center = self.screen_center
             else:
-                render_score = self.font.render(f'Unfortunately your final score is: $ {final_score}', True,
-                                                self.gold)
+                render_score = self.fonts[3].render(f'Unfortunately your final score is: $ {final_score}', True,
+                                                    self.gold)
                 render_score_rect = render_score.get_rect()
                 render_score_rect.center = self.screen_center
             self.screen.blit(render_score, (render_score_rect.x, render_score_rect.y))
             pygame.display.flip()
             pygame.time.delay(3000)
+            save_highscore(final_score)
             self.game_sound.stop()
             self.game = False
 
@@ -150,6 +137,7 @@ class Game(GameUI):
                     self.question_map[i] = False
 
         def show_correct_or_false(res):
+            self.graph = self.show_phone_result = False
             render_answers_background()
             render_answers()
             pygame.display.flip()
@@ -186,11 +174,11 @@ class Game(GameUI):
 
         def check_answers_length(ans):
             if len(ans) > 60:
-                return self.font_4.render(ans, True, self.white)
+                return self.fonts[0].render(ans, True, self.white)
             elif len(ans) > 40:
-                return self.font_3.render(ans, True, self.white)
+                return self.fonts[1].render(ans, True, self.white)
             else:
-                return self.font_2.render(ans, True, self.white)
+                return self.fonts[2].render(ans, True, self.white)
 
         def update_questions():
             if self.question_nr >= 14:
@@ -200,7 +188,6 @@ class Game(GameUI):
             self.answers = self.questions[self.question_nr]['answers']
             self.correct = self.questions[self.question_nr]['correct']
             self.question_map = [True, True, True, True]
-            self.graph = self.show_phone_result = False
 
         def render_prizes():
             self.screen.blit(self.score_bg, (1390, self.y_coord[self.question_nr]))
@@ -210,7 +197,7 @@ class Game(GameUI):
                     color = self.white
                 else:
                     color = self.gold
-                item = self.font_2.render(f'{i + 1}: $ {self.prizes[i]}', True, color)
+                item = self.fonts[2].render(f'{i + 1}: $ {self.prizes[i]}', True, color)
                 prize_surfaces.append(item)
             step = 0
             for i in range(len(prize_surfaces)):
@@ -237,25 +224,20 @@ class Game(GameUI):
         def render_question():
             if len(self.question) > 86:
                 splitted_question = manage_question_length()
-                question_text_1 = self.font.render(splitted_question[0], True, self.white)
-                question_text_2 = self.font.render(splitted_question[1], True, self.white)
-                question_text_1_rect = question_text_1.get_rect()
-                question_text_1_rect.center = self.screen_center
-                question_text_2_rect = question_text_2.get_rect()
-                question_text_2_rect.center = self.screen_center
-                self.screen.blit(question_text_1, (question_text_1_rect.x, 605))
-                self.screen.blit(question_text_2, (question_text_2_rect.x, 640))
+                question_texts = [self.fonts[3].render(splitted_question[i], True, self.white) for i in range(2)]
+                question_texts_rect = [question_texts[i].get_rect() for i in range(2)]
+                for i in range(2):
+                    question_texts_rect[i].center = self.screen_center
+                self.screen.blit(question_texts[0], (question_texts_rect[0].x, 605))
+                self.screen.blit(question_texts[1], (question_texts_rect[1].x, 640))
             else:
-                question_text = self.font.render(self.question, True, self.white)
+                question_text = self.fonts[3].render(self.question, True, self.white)
                 question_text_rect = question_text.get_rect()
                 question_text_rect.center = self.screen_center
                 self.screen.blit(question_text, (question_text_rect.x, 620))
 
         def render_answers_background():
-            ans_a = self.font.render("A:", True, self.gold)
-            ans_b = self.font.render("B:", True, self.gold)
-            ans_c = self.font.render("C:", True, self.gold)
-            ans_d = self.font.render("D:", True, self.gold)
+            ans_letter = [self.fonts[3].render(f"{chr(i)}:", True, self.gold) for i in range(ord("A"), ord("E"))]
             answers_bg_rect = self.answers_bg_1.get_rect()
             answers_bg_rect.center = self.screen_center
             if self.show_phone_result:
@@ -268,31 +250,20 @@ class Game(GameUI):
                                                  self.answer_bg_ycoord + 100))
             self.screen.blit(self.answers_bg_4, (answers_bg_rect.x + self.answer_bg_xcoord,
                                                  self.answer_bg_ycoord + 100))
-            self.screen.blit(ans_a, (264, 752))
-            self.screen.blit(ans_b, (988, 752))
-            self.screen.blit(ans_c, (264, 852))
-            self.screen.blit(ans_d, (988, 852))
+            self.screen.blit(ans_letter[0], (264, 752))
+            self.screen.blit(ans_letter[1], (988, 752))
+            self.screen.blit(ans_letter[2], (264, 852))
+            self.screen.blit(ans_letter[3], (988, 852))
 
         def render_answers():
-            answer_text_1 = check_answers_length(self.answers[0])
-            answer_text_2 = check_answers_length(self.answers[1])
-            answer_text_3 = check_answers_length(self.answers[2])
-            answer_text_4 = check_answers_length(self.answers[3])
-
-            answer_text_rect_1 = answer_text_1.get_rect()
-            answer_text_rect_2 = answer_text_2.get_rect()
-            answer_text_rect_3 = answer_text_3.get_rect()
-            answer_text_rect_4 = answer_text_4.get_rect()
-
-            answer_text_rect_1.center = self.screen_center
-            answer_text_rect_2.center = self.screen_center
-            answer_text_rect_3.center = self.screen_center
-            answer_text_rect_4.center = self.screen_center
-
-            self.screen.blit(answer_text_1, (answer_text_rect_1.x - self.answer_bg_xcoord, 755))
-            self.screen.blit(answer_text_2, (answer_text_rect_2.x + self.answer_bg_xcoord, 755))
-            self.screen.blit(answer_text_3, (answer_text_rect_3.x - self.answer_bg_xcoord, 855))
-            self.screen.blit(answer_text_4, (answer_text_rect_4.x + self.answer_bg_xcoord, 855))
+            answer_text = [check_answers_length(self.answers[i]) for i in range(4)]
+            answer_text_rect = [answer_text[i].get_rect() for i in range(4)]
+            for i in range(4):
+                answer_text_rect[i].center = self.screen_center
+            self.screen.blit(answer_text[0], (answer_text_rect[0].x - self.answer_bg_xcoord, 755))
+            self.screen.blit(answer_text[1], (answer_text_rect[1].x + self.answer_bg_xcoord, 755))
+            self.screen.blit(answer_text[2], (answer_text_rect[2].x - self.answer_bg_xcoord, 855))
+            self.screen.blit(answer_text[3], (answer_text_rect[3].x + self.answer_bg_xcoord, 855))
 
         def manage_hover_click(mx, my):
             manage_help_tools_click(mx, my)
